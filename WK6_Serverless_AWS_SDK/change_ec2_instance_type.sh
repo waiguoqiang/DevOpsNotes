@@ -1,35 +1,3 @@
-Skip to content
-Search or jump to…
-Pull requests
-Issues
-Marketplace
-Explore
- 
-@SunnyLLL 
-awsdocs
-/
-aws-doc-sdk-examples
-Public
-Code
-Issues
-171
-Pull requests
-20
-Actions
-Projects
-Wiki
-Security
-Insights
-aws-doc-sdk-examples/aws-cli/bash-linux/ec2/change-ec2-instance-type/change_ec2_instance_type.sh
-@vitaliyf
-vitaliyf Clarify change_ec2_instance_type.sh arguments (#2004)
-…
-Latest commit 44ec1e6 on 23 Sep 2021
- History
- 3 contributors
-@bisdavid@vitaliyf@Doug-AWS
-Executable File  273 lines (242 sloc)  9.9 KB
-   
 #!/usr/bin/env bash
 ###############################################################################
 # Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
@@ -303,16 +271,3 @@ function change_ec2_instance_type {
 }
 
 #// snippet-end:[ec2.bash.change-instance-type.complete]
-© 2022 GitHub, Inc.
-Terms
-Privacy
-Security
-Status
-Docs
-Contact GitHub
-Pricing
-API
-Training
-Blog
-About
-Loading complete
