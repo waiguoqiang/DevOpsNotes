@@ -35,21 +35,24 @@ var ddb = new AWS.DynamoDB({apiVersion: '2012-08-10'});
 ```
 2. Add following code before the return statement of your `GetStartedLambdaProxyIntegration` Lambda Function.
 ```
-let params = {
+    let params = {
       TableName: 'HelloWorldTable',
       Item: {
         'name' : {S: name},
         'city' : {S: city}
       }
     };
-    let ddbResponse = await ddb.putItem(params, function(err, data) {
-      if (err) {
-        console.log("Error", err);
-      } else {
-        console.log("Success", data);
-      }
-    }).promise();
-    console.log('ddbResponse', ddbResponse)
+    console.log("params: ", params)
+    const putItemCommand = new PutItemCommand(params); 
+
+    try {
+        const data = await client.send(putItemCommand);
+        console.log("Item added successfully:", JSON.stringify(data, null, 2));
+      } catch (err) {
+        console.error("Error adding item:", err);
+
+
+    };
  ```
 
 ## Test that you are successfully writing to DynamoDB table
