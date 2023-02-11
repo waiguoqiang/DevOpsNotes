@@ -2,9 +2,9 @@
 
 ## The Scenario
 
-In this example, you use a Node.js modules to write one item in a DynamoDB table by using these methods of the `AWS.DynamoDB` client class:
+In this example, you use a Node.js modules to write one item in a DynamoDB table by using these methods of the `PutItemCommand` client class:
 
--   [putItem](https://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/DynamoDB.html#putItem-property)
+-   [PutItemCommand]([https://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/DynamoDB.html#putItem-property](https://docs.aws.amazon.com/AWSJavaScriptSDK/v3/latest/clients/client-dynamodb/classes/putitemcommand.html#constructor))
 
 ## Create a DynamoDB table
 
@@ -50,8 +50,6 @@ var ddb = new AWS.DynamoDB({apiVersion: '2012-08-10'});
         console.log("Item added successfully:", JSON.stringify(data, null, 2));
       } catch (err) {
         console.error("Error adding item:", err);
-
-
     };
  ```
 
