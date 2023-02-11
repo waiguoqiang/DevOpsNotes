@@ -11,10 +11,6 @@ In this tutorial, you do the following:
 
 **Topics**
 
--   [Create a "Hello, World!" Lambda function](https://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-create-api-as-simple-proxy-for-lambda.html#api-gateway-proxy-integration-create-lambda-backend)
--   [Create a "Hello, World!" API](https://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-create-api-as-simple-proxy-for-lambda.html#api-gateway-create-api-as-simple-proxy-for-lambda-build)
--   [Deploy and test the API](https://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-create-api-as-simple-proxy-for-lambda.html#api-gateway-create-api-as-simple-proxy-for-lambda-test)
-
 ## Create a "Hello, World!" Lambda function
 
 This function returns a greeting to the caller as a JSON object in the following format:
