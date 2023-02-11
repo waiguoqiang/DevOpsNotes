@@ -51,6 +51,12 @@ This function returns a greeting to the caller as a JSON object in the following
 1.  ```
     'use strict';
     console.log('Loading hello world function');
+    // Load the AWS SDK for Node.js
+    import { DynamoDBClient, PutItemCommand } from "@aws-sdk/client-dynamodb";
+    // Create the DynamoDB service object
+    const client = new DynamoDBClient({
+      region: "ap-southeast-2"
+    });
 
     export const handler = async (event) => {
         let name = "you";
