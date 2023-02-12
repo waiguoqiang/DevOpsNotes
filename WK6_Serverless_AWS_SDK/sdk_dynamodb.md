@@ -25,13 +25,14 @@ In this example, you use a Node.js modules to write one item in a DynamoDB table
 1. Add following code to the start your `GetStartedLambdaProxyIntegration` Lambda Function.
 
 ```
+
 // Load the AWS SDK for Node.js
-var AWS = require('aws-sdk');
-AWS.config.update({region: 'ap-southeast-2'})
-
-
+import { DynamoDBClient, PutItemCommand } from "@aws-sdk/client-dynamodb";
 // Create the DynamoDB service object
-var ddb = new AWS.DynamoDB({apiVersion: '2012-08-10'});
+const client = new DynamoDBClient({
+  region: "ap-southeast-2"
+});
+
 ```
 2. Add following code before the return statement of your `GetStartedLambdaProxyIntegration` Lambda Function.
 ```
