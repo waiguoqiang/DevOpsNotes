@@ -103,6 +103,8 @@ Let's write a playbook to do the following
 
 * Install nginx service and config the index page
 
+The `site.yaml` in the repo is for your reference, please follow the instructions in the course video.
+
 ```bash
 ansible-playbook -e name=Liji -i ../inventory.aws_ec2.yaml site.yaml
 ```
