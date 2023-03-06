@@ -1,7 +1,7 @@
 # Kubernetes Autoscaling
 This is the handson to show you use kubectl tools to autoscale the application.
 
-# Prerequisite 
+# Prerequisite
 
 ## Kind and Kubectl
 - kind is a tool for running local Kubernetes clusters using Docker container “nodes”.
@@ -54,37 +54,31 @@ https://github.com/dockersamples/example-voting-app
 git clone https://github.com/dockersamples/example-voting-app
 ```
 
-###Step 1. Go to the cloned folder and create namespace
+###Step 1. Go to the cloned folder
 ```
 cd example-voting-app
-kubectl create namespace vote                                                           
 ```
-You should see
-```
-namespace/vote created
-```
-###Step 2. Remove k8s-specifications/vote-namespace.yml
-```
-rm k8s-specifications/vote-namespace.yml
-```
+
+###Step 2. Increase replicas
+
 Modify k8s-specifications/vote-deployment.yml
-changed: 
+changed:
 ```
 spec:
   replicas: 1
 ```
-to 
+to
 ```
 spec:
   replicas: 3
 ```
 
 Note:
-- Namespaces provide a scope for names. Names of resources need to be unique within a namespace.
+- The latest version of this example removed namespace, so containers are created in the default namespace.
 
 ###Step 3. Now let us create the cluster
 ```
-kubectl create -f k8s-specifications/                                                   
+kubectl apply -f k8s-specifications/
 ```
 It should return
 ```
@@ -101,8 +95,8 @@ deployment.apps/worker created
 
 ###Step 4. Check the status
 ```
-kubectl get pods --namespace=vote --output=wide
-kubectl get services --namespace=vote
+kubectl get pods --output=wide
+kubectl get services
 ```
 
 ###Step 5. Port Forward
@@ -110,7 +104,7 @@ Since we are not on google cloud and don't have a loadbalancer setup, we can por
 
 Use a new terminal window and type the following:
 ```
-kubectl port-forward svc/vote --namespace=vote 5000:5000
+kubectl port-forward svc/vote 5000:5000
 ```
 
 You should be able to visit http://localhost:5000, which is the vote service.
@@ -119,7 +113,7 @@ You should be able to visit http://localhost:5000, which is the vote service.
 
 Use a new terminal window and type the following:
 ```
-kubectl port-forward svc/result --namespace=vote 5001:5001
+kubectl port-forward svc/result 5001:5001
 ```
 
 You should be able to visit http://localhost:5001, which is the result service.
@@ -128,14 +122,13 @@ You should be able to visit http://localhost:5001, which is the result service.
 
 Also, try to understand what does these mean:
 ```
-kubectl get pods --namespace=vote --output=wide
-kubectl get svc --namespace=vote
-kubectl get deploy -n vote
+kubectl get pods --output=wide
+kubectl get svc
+kubectl get deploy
 
 ```
 
 Note:
-- `--namespace` can be short as `-n`
 - there are short names there. For example, pod (po), service (svc), replicationcontroller (rc), deployment (deploy), replicaset (rs) , etc.
 
 Try to delete a pod and see if it gets deleted:
@@ -148,7 +141,7 @@ Do you know how to find out the right command to use?
 Note:
 - You can also try to see the log, which is useful if something is wrong, e.g.
 ```
-kubectl logs svc/vote -n vote
+kubectl logs svc/vote
 ```
 
 
@@ -158,42 +151,42 @@ You can also scale the nodes manually. Are you able to find the command?
 
 ### Step 1. check the current replicas
 ```bash
-kubectl get rs -n vote
+kubectl get rs
 ```
 ### Step 2. manually scale the replica for vote deployment
 ```bash
-kubectl scale --replicas=6 deployment/vote -n vote
+kubectl scale --replicas=6 deployment/vote
 ```
 ### Step 3. check the replica for the deployment and also check the vote detail
 ```
-kubectl get deploy -n vote
+kubectl get deploy
 ```
 ```
-kubectl describe deploy/vote -n vote
+kubectl describe deploy/vote
 ```
 so what is the big deal of setting replica?
 
 ## Auto Scaling
 ### Step 1. Let us set the Auto Scaling Policy for our nodes
 ```
-kubectl autoscale deployment vote --namespace=vote --cpu-percent=50 --min=1 --max=10
+kubectl autoscale deployment vote --cpu-percent=50 --min=1 --max=10
 ```
 ### Step 2. Check the settings:
 ```
-kubectl get hpa --namespace=vote
+kubectl get hpa
 ```
 
 ### Step 3. Debug
 Let us check what is wrong?
 Did you see `<unknown>/50%`?
 ```
-kubectl describe hpa --namespace=vote
+kubectl describe hpa
 ```
 We will see the error and warning message as below.
 
 ![Alt text](../images/horizonal-pod-autoscaler-error.png?raw=true)
 
-To fix it, we need to spin up metric server. 
+To fix it, we need to spin up metric server.
 1. Visit https://github.com/kubernetes-sigs/metrics-server
 2. Look at Deployment section
 3. Inspect `components.yaml` file under the hands_on folder. The highlight is as below.
@@ -206,7 +199,7 @@ containers:
       - /metrics-server
       - --kubelet-insecure-tls
       - --kubelet-preferred-address-types=InternalIP
-    ## add the config as above  
+    ## add the config as above
 ```
 4 . Apply the resource
 ```
@@ -217,20 +210,20 @@ kubectl apply -f ./hands_on/components.yaml
 
 ```
 kubectl get pods -n kube-system
-kubectl logs <pod> -n kube-system 
+kubectl logs <pod> -n kube-system
 ```
 You should be able to see metric server running
 
 6 . Go to example-voting-app repo and Delete the old hpa:
 
 ```
-kubectl delete hpa --all --namespace=vote
+kubectl delete hpa --all
 ```
 
 7 . Stop the current app:
 ```
 kubectl delete -f k8s-specifications/
-``` 
+```
 8 . Add the following to `vote-deployment.yaml` under container
 ```
         resources:
@@ -258,34 +251,33 @@ as like
 
 See more https://kubernetes.io/docs/tasks/configure-pod-container/assign-cpu-resource/
 
-9 . Recreate everything:
+9 . Apply the change:
 ```
-kubectl create namespace vote
-kubectl create -f k8s-specifications/
-``` 
+kubectl apply -f k8s-specifications/
+```
 10 . Recreate asg rule:
 ```
-kubectl autoscale deployment vote --namespace=vote --cpu-percent=50 --min=1 --max=10
+kubectl autoscale deployment vote --cpu-percent=50 --min=1 --max=10
 ```
 In the beginning, you will still see the metric error, but **after a couple of mins**, then you should see
 ```
-kubectl get hpa --namespace=vote                                                        
+kubectl get hpa
 NAME   REFERENCE         TARGETS   MINPODS   MAXPODS   REPLICAS   AGE
 vote   Deployment/vote   xxx%/50%     1         10        1          38s
 ```
 
 You can check what happen with
 ```
-kubectl describe hpa -n vote
+kubectl describe hpa
 ```
 
 - Q: Do you know why it is like that?
 
 11 . Test scale
 
-We can give a low cpu-percent so it will scale up. 
+We can give a low cpu-percent so it will scale up.
 ```
-kubectl autoscale deployment vote --namespace=vote --cpu-percent=1 --min=1 --max=10
+kubectl autoscale deployment vote --cpu-percent=1 --min=1 --max=10
 ```
 
 Or more interestingly, we can increase the load.
@@ -293,7 +285,7 @@ In the real world, so we will see how the autoscaler reacts to the increased loa
 
 forward the port first
 ```
-kubectl port-forward svc/vote --namespace=vote 5000:5000
+kubectl port-forward svc/vote 5000:5000
 ```
 
 We will send an infinite loop of queries to localhost:5000. Note you should keep the port forwarding work in the example-voting-app.
@@ -307,14 +299,14 @@ After a minute or so, you can stop the load script, and check the hpa again.
 
 Note: If the load is lower, then it can also scale down.
 ```
-kubectl describe hpa --namespace=vote
+kubectl describe hpa
 ```
 You will find it automatically scale up and down
 
 ![Alt text](../images/scale-up-down.png?raw=true)
 
 ```
-kubectl get po -n vote
+kubectl get po
 ```
 You will find more pods for vote
 
@@ -329,16 +321,16 @@ https://kubernetes.io/docs/tasks/run-application/horizontal-pod-autoscale-walkth
 
 - Q: Explain CPU units, what`cpu: XXXm` mean?
     The CPU resource is measured in CPU units. One CPU, in Kubernetes, is equivalent to:
-    
+
     - AWS vCPU
     - GCP Core
     - Azure vCore
     - Hyperthread on a bare-metal Intel processor with Hyperthreading
-    
+
     Fractional values are allowed. A Container that requests 0.5 CPU is guaranteed half as much CPU as a Container that requests 1 CPU. You can use the suffix m to mean milli. For example 100m CPU, 100 milliCPU, and 0.1 CPU are all the same. Precision finer than 1m is not allowed.
-    
+
     CPU is always requested as an absolute quantity, never as a relative quantity; 0.1 is the same amount of CPU on a single-core, dual-core, or 48-core machine.
-    
+
 - Q: What if you specify a CPU request that is too big for your Nodes,
 
     Try to edit
@@ -350,9 +342,9 @@ https://kubernetes.io/docs/tasks/run-application/horizontal-pod-autoscale-walkth
             cpu: "100"
     ```
     Stop/restart again
-    
+
     ```
-    kubectl get pods -n vote
+    kubectl get pods
     NAME                      READY   STATUS             RESTARTS   AGE
     db-6789fcc76c-bb8hc       1/1     Running            0          21s
     redis-554668f9bf-qzv58    1/1     Running            0          21s
@@ -361,11 +353,11 @@ https://kubernetes.io/docs/tasks/run-application/horizontal-pod-autoscale-walkth
     worker-dd46d7584-gcbbk    0/1     CrashLoopBackOff   1          21s
     ```
     The output shows that the Pod status for vote is Pending. That is, the Pod has not been scheduled to run on any Node, and it will remain in the Pending state indefinitely
-    
+
     ```
-    kubectl describe pod vote-bfb5bbc9d-m4kfr -n vote
+    kubectl describe pod vote-bfb5bbc9d-m4kfr
     ```
-    
+
     then you will see error as below
     ```
     Events:
@@ -379,17 +371,17 @@ https://kubernetes.io/docs/tasks/run-application/horizontal-pod-autoscale-walkth
     If you do not specify a CPU limit for a Container, then one of these situations applies:
 
     1. The Container has no upper bound on the CPU resources it can use. The Container could use all of the CPU resources available on the Node where it is running.
-    
+
     2. The Container is running in a namespace that has a default CPU limit, and the Container is automatically assigned the default limit. Cluster administrators can use a LimitRange to specify a default value for the CPU limit.
 
-- Motivation for CPU requests and limits 
+- Motivation for CPU requests and limits
 
-    By configuring the CPU requests and limits of the Containers that run in your cluster, you can make efficient use of the CPU resources available on your cluster Nodes. 
-    
+    By configuring the CPU requests and limits of the Containers that run in your cluster, you can make efficient use of the CPU resources available on your cluster Nodes.
+
     By keeping a Pod CPU request low, you give the Pod a good chance of being scheduled. By having a CPU limit that is greater than the CPU request, you accomplish two things:
 
     1. The Pod can have bursts of activity where it makes use of CPU resources that happen to be available.
-    
+
     2. The amount of CPU resources a Pod can use during a burst is limited to some reasonable amount.
 
 see more https://kubernetes.io/docs/tasks/configure-pod-container/assign-cpu-resource/

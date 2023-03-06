@@ -18,16 +18,16 @@ and then you can access your cluster via the API
 http://localhost:8080/api/v1/proxy/namespaces/<NAMESPACE>/services/<SERVICE-NAME>:<PORT-NAME>/
 ```
 However, there are a few scenarios that you would use this:
-* Debugging your services, or connecting to them directly from your laptop for some reason 
-  
+* Debugging your services, or connecting to them directly from your laptop for some reason
+
 * Allowing internal traffic, displaying internal dashboards, etc.
 
-__Note: You should NOT use this to expose your service to the internet or use it for production services, because it 
+__Note: You should NOT use this to expose your service to the internet or use it for production services, because it
 requires you to run kubectl as an authenticated user.__
 
 
 ## NodePort
-A NodePort service is the most primitive way to get external traffic directly to your service. NodePort, 
+A NodePort service is the most primitive way to get external traffic directly to your service. NodePort,
 as the name implies, opens a specific port on all the Nodes (the VMs), and any traffic that is sent to this port is
 forwarded to the service.
 
@@ -52,7 +52,7 @@ Load Balancer that will give you a single IP address that will forward all traff
 ![Alt text](../images/cluster_loadbalancer.png?raw=true)
 
 ### When would you use this?
-If you want to directly expose a service, this is the default method. All traffic on the port you specify will be 
+If you want to directly expose a service, this is the default method. All traffic on the port you specify will be
 forwarded to the service. This means you can send almost any kind of traffic to
 it, like HTTP, TCP, UDP, Websockets, gRPC, or whatever. https://cloud.google.com/compute/docs/load-balancing/network/
 
@@ -63,7 +63,7 @@ for a LoadBalancer per exposed service, which can get expensive!
 Unlike all the above examples, Ingress is actually NOT a type of service. Instead, it sits in front of multiple services
 and act as a “smart router” or entrypoint into your cluster.
 
-You can do a lot of different things with an Ingress, and there are many types of Ingress controllers that have 
+You can do a lot of different things with an Ingress, and there are many types of Ingress controllers that have
 different capabilities.
 
 The default GKE ingress controller will spin up an HTTP(S) Load Balancer for you.
@@ -76,7 +76,7 @@ service.
 
 ### When would you use this?
 Ingress is probably the most powerful way to expose your services, but can also be the most complicated. There are many
-types of Ingress controllers, from the Google Cloud Load Balancer, Nginx, Contour, Istio, and more. There are also 
+types of Ingress controllers, from the Google Cloud Load Balancer, Nginx, Contour, Istio, and more. There are also
 plugins for Ingress controllers, like the cert-manager, that can automatically provision SSL certificates for your
 services.
 
@@ -163,25 +163,25 @@ spec:
   - services:
     - name: vote
       port: 80
-    
+
 ```
 Note that kind is not Ingress, as HTTPProxy provide richer experience of projectcontour. Explore the benefits here:
 https://projectcontour.io/docs/main/config/fundamentals/
 
 ### Step 3. Create a `run.sh` file in the example-voting-app root folder (outside k8s-specifications)
-We will need to 
+We will need to
 * re-config our cluster
 * install contour
 * create a namespace
 * create the nodes, pods and deploy all services
 ```
+kind delete cluster
+
 kind create cluster --config=config.yaml
 
 kubectl apply -f https://projectcontour.io/quickstart/contour.yaml
 
-kubectl create namespace vote
-
-kubectl create -f k8s-specifications/
+kubectl apply -f k8s-specifications/
 ```
 
 ### Step 4. Add a config file in the example-voting-app root folder (outside k8s-specifications)
@@ -210,36 +210,36 @@ chmod u+x run.sh
 ### Step 5. Check Status
 Check service status
 ```
-kubectl get services --output wide -n vote
+kubectl get services --output wide
 kubectl get services -o wide -n projectcontour
 ```
 Check pod status
 ```
-kubectl get pods --output wide -n vote
+kubectl get pods --output wide
 kubectl get pods -n projectcontour -o wide
 ```
 Check logs of a particular service
 ```
-kubectl logs svc/result -n vote
+kubectl logs svc/result
 kubectl logs svc/contour -n projectcontour
-kubectl logs svc/db -n vote
+kubectl logs svc/db
 ```
 Check the HTTP Proxy status and config
 ```
-kubectl get httpproxy -n vote
-kubectl describe httpproxy vote-proxy -n vote
+kubectl get httpproxy
+kubectl describe httpproxy vote-proxy
 ```
 Check nodes
 ```
-kubectl get nodes -n vote -o wide
-kubectl describe node kind-worker -n vote
+kubectl get nodes  -o wide
+kubectl describe node kind-worker
 ```
 
 ### Step 6. Identify Errors
 
 The result page never works, what happened?
 ```
-kubectl logs svc/result -n vote
+kubectl logs svc/result
 ```
 It says
 ```
@@ -247,7 +247,7 @@ Waiting for db
 ```
 Let us check the db logs
 ```
-kubectl logs svc/db -n vote
+kubectl logs svc/db
 ```
 It shows
 ```
@@ -283,7 +283,7 @@ Let us restart
 ### Step 9. Viola
 Once the containers are running, let us validate:
 ```
-kubectl logs svc/db -n vote
+kubectl logs svc/db
 ```
 You should see:
 ```
@@ -296,7 +296,7 @@ LOG:  database system is ready to accept connections
 ```
 Check:
 ```
-kubectl logs svc/result -n vote
+kubectl logs svc/result
 ```
 You should see:
 ```
@@ -309,5 +309,5 @@ Open http://localhost:31001/ and you should see a working version result page:
 ![Alt text](../images/result.png?raw=true)
 
 The number of vote will remain 1 vote no matter how many times you reload your page. However, it will change when you
-use a different browser to access. 
+use a different browser to access.
 
