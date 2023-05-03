@@ -120,6 +120,18 @@ docker run --name jenkins \
 ```bash
 sudo cat secrets/initialAdminPassword
 ```
+You can also get the initial password from your Docker container log, or you can bash into your Docker container and get it from inside:
+
+To see the docker container id
+
+```bash
+docker container ls 
+```
+Then enter in bash inside a container.
+
+```bash
+docker exec -it CONTAINER_ID bash
+```
 
 #### 5. Continue installation in step #3 with password from step #4
 
