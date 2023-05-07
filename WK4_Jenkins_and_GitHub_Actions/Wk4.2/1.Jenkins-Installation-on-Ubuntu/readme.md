@@ -52,7 +52,7 @@ You need to add the Jenkins Debian repository to your local apt list.
 First, use the following ``wget`` command to import the GPG key for the Jenkins repository:
 
 ```bash
-wget -q -O - https://pkg.jenkins.io/debian-stable/jenkins.io.key | sudo apt-key add -
+wget -q -O - https://pkg.jenkins.io/debian-stable/jenkins.io-2023.key | sudo apt-key add -
 ```
 
 The output of above command should be **``OK``**, which means that the key was successfully imported and that packages from this repository will be considered trusted.
